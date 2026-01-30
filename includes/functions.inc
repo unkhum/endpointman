@@ -377,7 +377,7 @@ class endpointmanager {
 
                         $row = & $this->eda->sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
 
-                        $sql = "INSERT INTO `endpointman_mac_list` (`mac`, `model`, `template_id`) VALUES ('" . $mac . "', '" . $model . "', '" . $template . "')";
+                        $sql = "INSERT INTO `endpointman_mac_list` (`mac`, `model`, `template_id`, `global_custom_cfg_data`, `global_user_cfg_data`, `config_files_override`, `specific_settings`, `global_settings_override`) VALUES ('" . $mac . "', '" . $model . "', '" . $template . "', '', '', '', '', '')";
                         $this->eda->sql($sql);
 
                         $sql = 'SELECT last_insert_id()';
@@ -387,7 +387,7 @@ class endpointmanager {
                             $line = 1;
                         }
 
-                        $sql = "INSERT INTO `endpointman_line_list` (`mac_id`, `ipei`, `ext`, `line`, `description`) VALUES ('" . $ext_id . "', '" . $ipei . "', '" . $ext . "', '" . $line . "', '" . addslashes($name) . "')";
+                        $sql = "INSERT INTO `endpointman_line_list` (`mac_id`, `ipei`, `ext`, `line`, `description`, `custom_cfg_data`, `user_cfg_data`) VALUES ('" . $ext_id . "', '" . $ipei . "', '" . $ext . "', '" . $line . "', '" . addslashes($name) . "', '', '')";
                         $this->eda->sql($sql);
 
                         $this->message['add_device'][] = "Added " . $name . " to line " . $line;
@@ -425,7 +425,7 @@ class endpointmanager {
                     $sql = "SELECT description FROM devices WHERE id = " . $reg[0]['value'];
                     $name = $this->eda->sql($sql, 'getOne');
 
-                    $sql = "INSERT INTO `endpointman_line_list` (`mac_id`, `ext`, `line`, `description`) VALUES ('" . $mac_id . "', '" . $reg[0]['value'] . "', '" . $lines[0]['value'] . "', '" . addslashes($name) . "')";
+                    $sql = "INSERT INTO `endpointman_line_list` (`mac_id`, `ext`, `line`, `description`, `custom_cfg_data`, `user_cfg_data`, `ipei`) VALUES ('" . $mac_id . "', '" . $reg[0]['value'] . "', '" . $lines[0]['value'] . "', '" . addslashes($name) . "', '', '', '')";
                     $this->eda->sql($sql);
 
                     $this->message['add_line'] = "Added '<i>" . $name . "</i>' to line '<i>" . $lines[0]['value'] . "</i>' on device '<i>" . $reg[0]['value'] . "</i>' <br/> Configuration Files will not be Generated until you click Save!";
@@ -443,7 +443,7 @@ class endpointmanager {
                 if ($this->eda->all_unused_registrations()) {
                     $lines = array_values($this->linesAvailable(NULL, $mac_id));
 
-                    $sql = "INSERT INTO `endpointman_line_list` (`mac_id`, `ext`, `line`, `description`) VALUES ('" . $mac_id . "', '" . $ext . "', '" . $lines[0]['value'] . "', '" . addslashes($displayname) . "')";
+                    $sql = "INSERT INTO `endpointman_line_list` (`mac_id`, `ext`, `line`, `description`, `custom_cfg_data`, `user_cfg_data`, `ipei`) VALUES ('" . $mac_id . "', '" . $ext . "', '" . $lines[0]['value'] . "', '" . addslashes($displayname) . "', '', '', '')";
                     $this->eda->sql($sql);
 
                     $this->message['add_line'] = "Added '<i>" . $name . "</i>' to line '<i>" . $lines[0]['value'] . "</i>' on device '<i>" . $reg[0]['value'] . "</i>' <br/> Configuration Files will not be Generated until you click Save!";
@@ -470,7 +470,7 @@ class endpointmanager {
                     $name = $displayname;
                 }
 
-                $sql = "INSERT INTO `endpointman_line_list` (`mac_id`, `ext`, `line`, `description`) VALUES ('" . $mac_id . "', '" . $ext . "', '" . $line . "', '" . addslashes($name) . "')";
+                $sql = "INSERT INTO `endpointman_line_list` (`mac_id`, `ext`, `line`, `description`, `custom_cfg_data`, `user_cfg_data`, `ipei`) VALUES ('" . $mac_id . "', '" . $ext . "', '" . $line . "', '" . addslashes($name) . "', '', '', '')";
                 $this->eda->sql($sql);
                 $this->message['add_line'] .= "Added " . $name . " to line " . $line . "<br/>";
                 return($mac_id);
