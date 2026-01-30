@@ -9,6 +9,7 @@
 
 namespace FreePBX\modules;
 
+#[\AllowDynamicProperties]
 class Endpointman_Config
 {
 	public $UPDATE_PATH;
