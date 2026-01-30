@@ -6,7 +6,8 @@
  */
 
 namespace FreePBX\modules;
- 
+
+#[\AllowDynamicProperties]
 class epm_data_abstraction {
     function __construct($config, $configmod) {
     	
