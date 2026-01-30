@@ -10,13 +10,14 @@
 namespace FreePBX\modules;
 use FreePBX;
 
+#[\AllowDynamicProperties]
 class Endpointman_Advanced
 {
     public $MODULES_PATH;
 	public $LOCAL_PATH;
 	public $PHONE_MODULES_PATH;
 
-	public function __construct($freepbx = null, $cfgmod = null, $epm_config)
+	public function __construct($freepbx = null, $cfgmod = null, $epm_config = null)
 	{
 		$this->freepbx = $freepbx;
 		$this->db = $freepbx->Database;
