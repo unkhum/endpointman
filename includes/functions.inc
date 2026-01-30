@@ -7,6 +7,8 @@
  * @license MPL / GPLv2 / LGPL
  * @package Provisioner
  */
+
+#[\AllowDynamicProperties]
 class endpointmanager {
 
     //Load this class upon construction of the class
