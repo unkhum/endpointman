@@ -43,7 +43,7 @@ function generate_xml_from_array ($array, $node_name, &$tab = -1)
 	return $xml;
 }
 
-
+#[\AllowDynamicProperties]
 class Endpointman implements \BMO {
 
 	//public $epm_config;
