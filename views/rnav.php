@@ -23,7 +23,7 @@
 	
 	function rnav_sub_menu_add_button($list, $name, $ico){
 		if (array_key_exists($name, $list)){
-			echo '<a href="?display=' . $name . '" class="btn list-group-item"><i class="fa ' . $ico . '"></i>&nbsp; ' . $list[$name] . '</a>';
+			echo '<a href="?display=' . $name . '" class="btn"><i class="fa ' . $ico . '"></i>&nbsp; ' . $list[$name] . '</a>';
 		}
 	}
 
