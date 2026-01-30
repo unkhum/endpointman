@@ -190,6 +190,7 @@ class Endpointman_Templates
 				//$settings['tz'] = FreePBX::Endpointman()->listTZ(FreePBX::Endpointman()->configmod->get("tz"));
 			} 
 			else {
+				$settings = [];
 				$settings['srvip'] = ""; //$this->configmod->get("srvip");
 				$settings['ntp'] = ""; //$this->configmod->get("ntp");
 				$settings['config_location'] = ""; //$this->configmod->get("config_location");
