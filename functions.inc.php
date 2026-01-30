@@ -324,10 +324,18 @@ function endpointman_configpageload() {
                 $line_list = array();
                 $template_list = array();
 
+                $info = array(
+                    'mac'         => '',
+                    'brand_id'    => '',
+                    'model_id'    => '',
+                    'template_id' => '',
+                    'product_id'  => '',
+                );
+
                 $currentcomponent->addguielem($section, new gui_textbox('epm_mac', $info['mac'], 'MAC Address', 'The MAC Address of the Phone Assigned to this Extension/Device. <br />(Leave Blank to Remove from Endpoint Manager)', '', 'Please enter a valid MAC Address', true, 17, false), 9);
                 $currentcomponent->addguielem($section, new gui_selectbox('epm_brand', $brand_list, $info['brand_id'], 'Brand', 'The Brand of this Phone.', false, 'frm_' . $display . '_brand_change(this.options[this.selectedIndex].value)', false), 9);
                 $currentcomponent->addguielem($section, new gui_selectbox('epm_model', $model_list, $info['model_id'], 'Model', 'The Model of this Phone.', false, 'frm_' . $display . '_model_change(this.options[this.selectedIndex].value,document.getElementById(\'epm_mac\').value)', false), 9);
-                $currentcomponent->addguielem($section, new gui_selectbox('epm_line', $line_list, $line_info['line'], 'Line', 'The Line of this Extension/Device.', false, '', false), 9);
+                $currentcomponent->addguielem($section, new gui_selectbox('epm_line', $line_list, '', 'Line', 'The Line of this Extension/Device.', false, '', false), 9);
                 $currentcomponent->addguielem($section, new gui_selectbox('epm_temps', $template_list, $info['template_id'], 'Template', 'The Template of this Phone.', false, '', false), 9);
                 $currentcomponent->addguielem($section, new guitext('epm_note', 'Note: This might reboot the phone if it\'s already registered to Asterisk'));
 		
