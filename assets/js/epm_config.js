@@ -1039,7 +1039,7 @@ function epm_config_tab_manager_bt_enable_disable_ajustar(iL0, itemData, level)
 	else if (level == "L3") 
 	{
 		//AJUSTAMOS BOTOSNES EN SU STATUS CORRECTO
-		if (itemData.enabled == "") {
+		if (itemData.enabled === "") {
 			$("#" + iL0.prefijoid + "_enable").attr("disabled", true).prop( "checked", false);
 			$("#" + iL0.prefijoid + "_disable").attr("disabled", true).prop( "checked", false);
 			epm_global_html_find_hide_and_remove('#' + iL0.boxsubite);
