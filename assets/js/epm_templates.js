@@ -242,6 +242,7 @@ function epm_templates_add_NewProductSelect_Change (obj)
 				$("#NewCloneModel").html(options);
 				$('#NewCloneModel option:first').attr('selected', 'selected');
 				$('#NewCloneModel').selectpicker('refresh');
+				$('#NewCloneModel').selectpicker('render');
 			}
 		});
 	}
