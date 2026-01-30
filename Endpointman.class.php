@@ -602,6 +602,7 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
      * @return array Number array used to generate a select box
      */
     function brands_available($selected = NULL, $show_blank=TRUE) {
+		$temp = [];
         $data = $this->eda->all_active_brands();
         if ($show_blank) {
             $temp[0]['value'] = "";
