@@ -326,7 +326,7 @@ class endpointmanager {
     }
 
     function add_device($mac, $model, $ext, $template=NULL, $line=NULL, $displayname=NULL) {
-		$ipei = $_REQUEST['ipei'];
+		$ipei = trim((string)($_REQUEST['ipei'] ?? ''));
         $mac = $this->mac_check_clean($mac);
         if ($mac) {
             if (empty($model)) {
