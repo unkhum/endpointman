@@ -91,6 +91,10 @@ class RainTPL{
 	 * @return RainTPL
 	 */
 
+	public function __construct($tpl_dir = null, $tpl_compile_dir = null, $base_dir = null) {
+		$this->RainTPL($tpl_dir, $tpl_compile_dir, $base_dir);
+	}
+
 	function RainTPL( $tpl_dir = null, $tpl_compile_dir = null, $base_dir = null ){
 		if( $tpl_dir )
 			RainTPL::$tpl_dir = $tpl_dir . ( substr($tpl_dir,-1,1) != "/" ? "/" : "" );
@@ -165,7 +169,7 @@ class RainTPL{
 		elseif( TPL_CACHE_ENABLED && file_exists( RainTPL::$tpl_compile_dir."/" . $tpl_dir . $tpl_name . "_" . ( $filetime = filemtime( $template_file ) ) . ".php" ) )
 			$compiled_filename = RainTPL::$tpl_compile_dir."/" . $tpl_dir . $tpl_name . "_" . $filetime . ".php";
 		else{
-			include_once "rain.tpl.compile.class.php";
+			include_once __DIR__ . "/rain.tpl.compile.class.php";
 			$RainTPLCompile_obj = new RainTPLCompile( );
 			$RainTPLCompile_obj->compileFile( $tpl_name, RainTPL::$tpl_dir . $tpl_dir, RainTPL::$tpl_compile_dir."/", RainTPL::$base_dir );
 			// template last update date
