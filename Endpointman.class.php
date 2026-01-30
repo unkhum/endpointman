@@ -97,14 +97,14 @@ class Endpointman implements \BMO {
 		$this->UPDATE_PATH = $this->configmod->get('update_server');
         $this->MODULES_PATH = $this->config->get('AMPWEBROOT') . '/admin/modules/';
 
-define("UPDATE_PATH", $this->UPDATE_PATH);
-define("MODULES_PATH", $this->MODULES_PATH);
+if (!defined('UPDATE_PATH')) define("UPDATE_PATH", $this->UPDATE_PATH);
+if (!defined('MODULES_PATH')) define("MODULES_PATH", $this->MODULES_PATH);
 
 
         //Determine if local path is correct!
         if (file_exists($this->MODULES_PATH . "endpointman/")) {
             $this->LOCAL_PATH = $this->MODULES_PATH . "endpointman/";
-define("LOCAL_PATH", $this->LOCAL_PATH);
+if (!defined('LOCAL_PATH')) define("LOCAL_PATH", $this->LOCAL_PATH);
         } else {
             die("Can't Load Local Endpoint Manager Directory!");
         }
@@ -124,7 +124,7 @@ define("LOCAL_PATH", $this->LOCAL_PATH);
                 die('Endpoint Manager can not create the modules folder!');
             }
         }
-define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
+if (!defined('PHONE_MODULES_PATH')) define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 
         //Define error reporting
         if (($this->configmod->get('debug')) AND (!isset($_REQUEST['quietmode']))) {
@@ -1161,7 +1161,20 @@ echo 'TFTP Server check failed on last past. Skipping';
     			//Determine if global settings have been overridden
     			if ($phone_info['template_id'] > 0) {
     				if (isset($phone_info['template_data_info']['global_settings_override'])) {
-    					$settings = unserialize($phone_info['template_data_info']['global_settings_override']);
+						$settings = @unserialize($phone_info['template_data_info']['global_settings_override']);
+						if (!is_array($settings)) {
+							$settings = [];
+						}
+						$defaults = [
+							'srvip' => $this->configmod->get('srvip'),
+							'ntp'   => $this->configmod->get('ntp'),
+							'config_location' => $this->configmod->get('config_location'),
+							'tz'    => $this->configmod->get('tz'),
+						];
+						$settings = array_merge($defaults, $settings);
+						if (empty($settings['tz'])) {
+							$settings['tz'] = $defaults['tz'] ?: 'UTC';
+						}
     				} else {
     					$settings['srvip'] = $this->configmod->get('srvip');
     					$settings['ntp'] = $this->configmod->get('ntp');
@@ -1170,7 +1183,20 @@ echo 'TFTP Server check failed on last past. Skipping';
     				}
     			} else {
     				if (isset($phone_info['global_settings_override'])) {
-    					$settings = unserialize($phone_info['global_settings_override']);
+						$settings = @unserialize($phone_info['global_settings_override']);
+						if (!is_array($settings)) {
+							$settings = [];
+						}
+						$defaults = [
+							'srvip' => $this->configmod->get('srvip'),
+							'ntp'   => $this->configmod->get('ntp'),
+							'config_location' => $this->configmod->get('config_location'),
+							'tz'    => $this->configmod->get('tz'),
+						];
+						$settings = array_merge($defaults, $settings);
+						if (empty($settings['tz'])) {
+							$settings['tz'] = $defaults['tz'] ?: 'UTC';
+						}
     				} else {
     					$settings['srvip'] = $this->configmod->get('srvip');
     					$settings['ntp'] = $this->configmod->get('ntp');
