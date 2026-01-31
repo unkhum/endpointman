@@ -24,26 +24,13 @@ class epm_data_abstraction {
         }
     }
 
-    function sql($sql, $type = "query", $params = null, $fetchmode = null) {
+    function sql($sql, $type="query", $fetchmode=null) {
         global $db;
 
-        if ($fetchmode === null && $params !== null && !is_array($params)) {
-            $fetchmode = $params;
-            $params = null;
-        }
-
-        $t = strtolower((string)$type);
-
-        if (in_array($t, ['getall', 'getrow', 'getone'], true)) {
-            if ($fetchmode !== null) {
-                $results = $db->$type($sql, $params, $fetchmode);
-            } elseif ($params !== null) {
-                $results = $db->$type($sql, $params);
-            } else {
-                $results = $db->$type($sql);
-            }
+        if ($fetchmode === null) {
+            $results = $db->$type($sql);
         } else {
-            $results = ($params !== null) ? $db->$type($sql, $params) : $db->$type($sql);
+            $results = $db->$type($sql, $fetchmode);
         }
 
         if (DB::IsError($results)) {
