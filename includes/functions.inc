@@ -95,8 +95,6 @@ class endpointmanager {
             }
         }
 
-        $this->apply_phone_modules_hotfixes();
-
         //include the local template class
         if (!class_exists('RainTPL')) {
             if (file_exists(LOCAL_PATH . "includes/rain.tpl.class.inc")) {
@@ -128,101 +126,6 @@ class endpointmanager {
         if ($this->global_cfg['disable_help']) {
             $this->tpl->assign("disable_help", 1);
         }
-    }
-
-    /**
-     * Hotfixes for _ep_phone_modules (folder is dynamic and can be replaced after reinstall/update).
-     * We patch known PHP8 fatal/warnings here to keep provisioning working.
-     */
-    private function apply_phone_modules_hotfixes(): void
-    {
-        if (!defined('PHONE_MODULES_PATH')) {
-            return;
-        }
-        $base = rtrim(PHONE_MODULES_PATH, '/').'/';
-
-        $this->hotfix_yealinkv80_timezone($base . 'endpoint/yealinkv80/base.php');
-        $this->hotfix_endpoint_base_gmtoffset($base . 'endpoint/base.php');
-    }
-
-    private function hotfix_yealinkv80_timezone(string $file): void
-    {
-        if (!is_file($file) || !is_readable($file) || !is_writable($file)) {
-            return;
-        }
-        $c = file_get_contents($file);
-        if ($c === false) {
-            return;
-        }
-
-        // already patched?
-        if (strpos($c, 'OSS-EPM-HOTFIX:YEALINKV80-TZ') !== false) {
-            return;
-        }
-
-        $old = "        preg_match('/.*(-|\\+)(\\d*):(\\d*)/i', \$this->timezone['timezone'], \$matches);\n" .
-               "        switch (\$matches[3]) {\n" .
-               "            case '30':\n" .
-               "                \$point = '.5';\n" .
-               "                break;\n" .
-               "            default:\n" .
-               "                \$point = '';\n" .
-               "                break;\n" .
-               "        }\n" .
-               "        \$this->timezone['timezone'] = \$matches[1] . \$matches[2] . \$point;\n";
-
-        $new = "        // OSS-EPM-HOTFIX:YEALINKV80-TZ (PHP8 guard for missing regex matches)\n" .
-               "        \$tz = (string)(\$this->timezone['timezone'] ?? '');\n" .
-               "        if (!preg_match('/.*([+-])(\\d+):?(\\d{2})?/i', \$tz, \$matches)) {\n" .
-               "            // Unknown format (e.g. IANA timezone). Do not rewrite, just avoid crash.\n" .
-               "            return;\n" .
-               "        }\n" .
-               "        \$minutes = \$matches[3] ?? '00';\n" .
-               "        \$point = (\$minutes === '30') ? '.5' : '';\n" .
-               "        \$this->timezone['timezone'] = \$matches[1] . \$matches[2] . \$point;\n";
-
-        if (strpos($c, $old) === false) {
-            // upstream changed - do nothing (avoid breaking new versions)
-            return;
-        }
-
-        $c2 = str_replace($old, $new, $c);
-        @file_put_contents($file, $c2);
-    }
-
-    private function hotfix_endpoint_base_gmtoffset(string $file): void
-    {
-        if (!is_file($file) || !is_readable($file) || !is_writable($file)) {
-            return;
-        }
-        $c = file_get_contents($file);
-        if ($c === false) {
-            return;
-        }
-
-        // already patched?
-        if (strpos($c, 'OSS-EPM-HOTFIX:GMTOFFSET') !== false) {
-            return;
-        }
-
-        $old = "        preg_match('/([\\-\\+])([\\d]+):?(\\d*)/', \$timezone, \$matches);\n" .
-               "        # \$matches is now an array; \$matches[1] is the sign (+ or -); \$matches[2] is number of hours, \$matches[3] is minutes (or empty)\n" .
-               "        return intval(\$matches[1] . \"1\") * (\$matches[2] * 3600 + \$matches[3] * 60);\n";
-
-        $new = "        // OSS-EPM-HOTFIX:GMTOFFSET (PHP8 guard for missing matches[3])\n" .
-               "        if (!preg_match('/([\\-\\+])([\\d]+):?(\\d*)/', (string)\$timezone, \$matches)) {\n" .
-               "            return 0;\n" .
-               "        }\n" .
-               "        \$min = (\$matches[3] ?? '');\n" .
-               "        \$min = (\$min === '') ? 0 : (int)\$min;\n" .
-               "        return intval(\$matches[1] . \"1\") * ((int)\$matches[2] * 3600 + \$min * 60);\n";
-
-        if (strpos($c, $old) === false) {
-            return;
-        }
-
-        $c2 = str_replace($old, $new, $c);
-        @file_put_contents($file, $c2);
     }
 
     function tftp_check() {
@@ -1927,6 +1830,7 @@ class endpointmanager {
      */
     function prepare_configs($phone_info, $reboot=TRUE, $write=TRUE) {
         epm_patch_provisioner_bool_offset_php82();
+        epm_patch_yealinkv80_timezone_base();
         if (!defined('PROVISIONER_BASE')) define('PROVISIONER_BASE', PHONE_MODULES_PATH);
         if (file_exists(PHONE_MODULES_PATH . 'autoload.php')) {
             if (!class_exists('ProvisionerConfig')) {
@@ -4060,4 +3964,28 @@ function endpointmanager_read_body($ch, $string) {
     //ob_flush();
     endpointman_flush_buffers();
     return $length;
+}
+
+function epm_patch_yealinkv80_timezone_base(): void
+{
+    if (!defined('PHONE_MODULES_PATH')) return;
+
+    $f = rtrim(PHONE_MODULES_PATH, '/') . '/endpoint/yealinkv80/base.php';
+    if (!is_file($f) || !is_readable($f) || !is_writable($f)) return;
+
+    $src = file_get_contents($f);
+    if ($src === false) return;
+
+    if (strpos($src, 'EPM_PATCH_YEALINKV80_TZ') !== false) return;
+
+    $src = str_replace(
+        "preg_match('/.*(-|\\+)(\\d*):(\\d*)/i', \$this->timezone['timezone'], \$matches);\n        switch (\$matches[3]) {",
+        "// EPM_PATCH_YEALINKV80_TZ\n        \$tz = \$this->timezone['timezone'] ?? '';\n        \$matches = [];\n        if (!preg_match('/.*([\\-+])(\\d{1,2}):(\\d{2})/i', (string)\$tz, \$matches)) {\n            \$this->timezone['timezone'] = '0';\n            return;\n        }\n        switch (\$matches[3]) {",
+        $src,
+        $count
+    );
+
+    if (empty($count)) return;
+
+    file_put_contents($f, $src);
 }
